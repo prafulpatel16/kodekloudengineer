@@ -1,0 +1,56 @@
+The Nautilus security team performed an audit of all servers present in Stratos DC. During the audit some critical data/files were identified as having the wrong permissions as per standards. Once the report was shared with the production support team, they started working to fix the issue. It has been identified that one of the files /etc/resolv.conf on Nautilus App 1 server has the wrong permissions, so that needs to be fixed and the correct ACLs need to be set.
+
+
+The owner and group owner of the file should be root user.
+
+Others must have read only permissions on the file.
+
+User ravi must not have any permission on the the file.
+
+User ryan should have read only permission on the file.
+
+
+
+#Login to app server
+ssh tony@stapp02
+#switch to root user
+sudo su
+
+#see existing aCL permissions
+root@stapp01 ~]# getfacl /etc/resolv.conf
+getfacl: Removing leading '/' from absolute path names
+# file: etc/resolv.conf
+# owner: root
+# group: root
+user::rw-
+group::r--
+other::r--
+
+#Condfrim user are alreayd existing
+[root@stapp01 ~]# id ravi
+uid=1002(ravi) gid=1002(ravi) groups=1002(ravi)
+
+[root@stapp01 ~]# id ryan
+uid=1003(ryan) gid=1003(ryan) groups=1003(ryan)
+[root@stapp01 ~]# 
+
+# Set ACL according to taks for multiple users
+[root@stapp01 ~]# setfacl -m u:ravi:-,ryan:r /etc/resolv.conf
+
+# check ACL permissions
+[root@stapp01 ~]# getfacl /etc/resolv.conf
+getfacl: Removing leading '/' from absolute path names
+# file: etc/resolv.conf
+# owner: root
+# group: root
+user::rw-
+user:ravi:---
+user:ryan:r--
+group::r--
+mask::r--
+other::r--
+
+
+
+
+
