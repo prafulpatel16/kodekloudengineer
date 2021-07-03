@@ -1,0 +1,42 @@
+
+
+Linux User Without Home
+
+
+thor@jump_host ~$ ssh steve@stapp02
+The authenticity of host 'stapp02 (172.16.238.11)' can't be established.
+ECDSA key fingerprint is SHA256:jvrc4eYFQ28PFkqTw11Pl2N4LzWi01V/hR7cDlmrlnU.
+ECDSA key fingerprint is MD5:55:4f:1a:5e:a0:64:98:7e:70:70:95:45:c0:a8:5b:52.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'stapp02,172.16.238.11' (ECDSA) to the list of known hosts.
+steve@stapp02's password: 
+[steve@stapp02 ~]$ sudo su -
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for steve: 
+[root@stapp02 ~]# 
+
+
+[root@stapp02 ~]# id javed
+id: javed: no such user
+[root@stapp02 ~]# cat /etc/passwd |grep javed
+[root@stapp02 ~]#
+
+
+[root@stapp02 ~]# id javed
+uid=1002(javed) gid=1002(javed) groups=1002(javed)
+[root@stapp02 ~]# 
+
+
+[root@stapp02 ~]#  ll /home/
+total 8
+drwx------ 1 ansible ansible 4096 Oct 15  2019 ansible
+drwx------ 1 steve   steve   4096 Jan 25  2020 steve
+[root@stapp02 ~]# 
+
