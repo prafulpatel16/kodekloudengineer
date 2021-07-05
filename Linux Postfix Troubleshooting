@@ -1,0 +1,117 @@
+
+Linux Postfix Troubleshooting
+
+
+Some users of the monitoring app have reported issues with xFusionCorp Industries mail server. They have a mail server in Stork DC where they are using postfix mail transfer agent. Postfix service seems to fail. Try to identify the root cause and fix it.
+
+
+ssh groot@stmail01
+
+
+switch to root user
+
+
+
+check the status of postfix
+sysemctl status postfix
+
+
+[root@stmail01 groot]# systemctl status postfix
+● postfix.service - Postfix Mail Transport Agent
+   Loaded: loaded (/usr/lib/systemd/system/postfix.service; enabled; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Mon 2021-07-05 17:24:29 UTC; 2min 5s ago
+  Process: 522 ExecStart=/usr/sbin/postfix start (code=exited, status=1/FAILURE)
+  Process: 521 ExecStartPre=/usr/libexec/postfix/chroot-update (code=exited, status=0/SUCCESS)
+  Process: 480 ExecStartPre=/usr/libexec/postfix/aliasesdb (code=exited, status=75)
+
+Jul 05 17:24:28 stmail01.stratos.xfusioncorp.com postfix[522]: fatal: parameter inet_interfaces: no local interfac...::1
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: Child 522 belongs to postfix.service
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: control process exited, code=exited ...s=1
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service got final SIGCHLD for state start
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service changed start -> failed
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: Job postfix.service/start finished, result=failed
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: Failed to start Postfix Mail Transport Agent.
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: Unit postfix.service entered failed state.
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service failed.
+Jul 05 17:24:29 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: cgroup is empty
+Hint: Some lines were ellipsized, use -l to show in full.
+[root@stmail01 groot]# 
+
+view the main.cf file and observe if localhost is commented or not
+cat /etc/postfix/main.cf |grep inet_interface
+
+[root@stmail01 groot]# cat /etc/postfix/main.cf |grep inet_interface
+# The inet_interfaces parameter specifies the network interface
+inet_interfaces = all
+#inet_interfaces = $myhostname
+#inet_interfaces = $myhostname, localhost
+inet_interfaces = localhost
+# the address list specified with the inet_interfaces parameter.
+# receives mail on (see the inet_interfaces parameter).
+# to $mydestination, $inet_interfaces or $proxy_interfaces.
+# - destinations that match $inet_interfaces or $proxy_interfaces,
+# unknown@[$inet_interfaces] or unknown@[$proxy_interfaces] is returned
+[root@stmail01 groot]# 
+
+
+need to edit the main.cf and comment the localhost
+
+vi/etc/postfix/main.cf
+
+inet_interfaces = all
+#inet_interfaces = $myhostname
+#inet_interfaces = $myhostname, localhost
+#inet_interfaces = localhost
+
+
+
+Do comment the localhost
+#inet_interfaces = localhost
+
+start postfix services
+systemctl start postfix
+
+[root@stmail01 groot]# systemctl status postfix
+● postfix.service - Postfix Mail Transport Agent
+   Loaded: loaded (/usr/lib/systemd/system/postfix.service; enabled; vendor preset: disabled)
+   Active: active (running) since Mon 2021-07-05 17:28:57 UTC; 13s ago
+  Process: 691 ExecStart=/usr/sbin/postfix start (code=exited, status=0/SUCCESS)
+  Process: 690 ExecStartPre=/usr/libexec/postfix/chroot-update (code=exited, status=0/SUCCESS)
+  Process: 686 ExecStartPre=/usr/libexec/postfix/aliasesdb (code=exited, status=0/SUCCESS)
+ Main PID: 762 (master)
+   CGroup: /docker/9e3ae9d9e5eb6e8b581c9c21673d6174bd611fc86b23499d20523068425ae486/system.slice/postfix.service
+           ├─762 /usr/libexec/postfix/master -w
+           ├─763 pickup -l -t unix -u
+           └─764 qmgr -l -t unix -u
+
+Jul 05 17:28:56 stmail01.stratos.xfusioncorp.com systemd[691]: Executing: /usr/sbin/postfix start
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com postfix/master[762]: daemon started -- version 2.10.1, configurati...ix
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: Child 691 belongs to postfix.service
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: control process exited, code=exited ...s=0
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service got final SIGCHLD for state start
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: New main PID 762 belongs to service, we are happy.
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: Main PID loaded: 762
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service changed start -> running
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: Job postfix.service/start finished, result=done
+Jul 05 17:28:57 stmail01.stratos.xfusioncorp.com systemd[1]: Started Postfix Mail Transport Agent.
+Hint: Some lines were ellipsized, use -l to show in full.
+
+telnet localhost 25
+
+[root@stmail01 groot]# telnet localhost 25
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+220 stmail01.stratos.xfusioncorp.com ESMTP Postfix
+
+
+
+
+
+
+
+
+
+
+
+
