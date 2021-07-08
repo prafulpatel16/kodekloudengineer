@@ -1,0 +1,51 @@
+Linux Collaborative Directories
+
+
+The Nautilus team doesn't want its data to be accessed by any of the other groups/teams due to security reasons and want their data to be strictly accessed by the sysops group of the team.
+
+
+Setup a collaborative directory /sysops/data on Nautilus App 3 server in Stratos Datacenter.
+
+The directory should be group owned by the group sysops and the group should own the files inside the directory. The directory should be read/write/execute to the group owners, and others should not have any access.
+
+ssh banner@stapp03
+The authenticity of host 'stapp03 (172.16.238.12)' can't be established.
+ECDSA key fingerprint is SHA256:E7tfxFWvm6Mb8HkGqkDvj2Xv+vvjASVclHdOD1cAoRA.
+ECDSA key fingerprint is MD5:0f:be:85:d8:0e:56:92:32:11:ec:27:a4:2d:3d:25:74.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'stapp03,172.16.238.12' (ECDSA) to the list of known hosts.
+banner@stapp03's password: 
+[banner@stapp03 ~]$ sudo su -
+
+
+ll /sysops
+
+ll /sysops
+ls: cannot access /sysops: No such file or directory
+
+mkdir -p /sysops/data
+[root@stapp03 ~]# ll /sysops
+total 4
+drwxr-xr-x 2 root root 4096 Jul  8 03:51 data
+
+
+
+[root@stapp03 ~]# ll -lsd /sysops/
+4 drwxr-xr-x 3 root root 4096 Jul  8 03:51 /sysops/
+
+
+root@stapp03 ~]# chgrp -R sysops /sysops/
+[root@stapp03 ~]# ll -lsd /sysops/
+4 drwxr-xr-x 3 root sysops 4096 Jul  8 03:51 /sysops/
+
+
+
+[root@stapp03 ~]# chmod -R 2770 /sysops/
+[root@stapp03 ~]# ll -lsd /sysops/
+4 drwxrws--- 3 root sysops 4096 Jul  8 03:51 /sysops/
+[root@stapp03 ~]# 
+
+
+
+
+
