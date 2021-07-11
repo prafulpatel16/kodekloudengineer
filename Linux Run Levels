@@ -1,0 +1,51 @@
+
+
+New tools have been installed on the app server in Stratos Datacenter. Some of these tools can only be managed from the graphical user interface. Therefore, there are requirements for these app servers.
+
+
+
+On all App servers in Stratos Datacenter change the default runlevel so that they can boot in GUI (graphical user interface) by default.
+
+
+
+systemctl get-default
+multi-user.target
+
+
+
+systemctl status graphical.target
+systemctl status graphical.target
+● graphical.target - Graphical Interface
+   Loaded: loaded (/usr/lib/systemd/system/graphical.target; static; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd.special(7)
+
+
+
+systemctl start graphical.target
+
+
+
+systemctl enable graphical.target
+
+
+systemctl status graphical.target
+graphical.target - Graphical Interface
+   Loaded: loaded (/usr/lib/systemd/system/graphical.target; static; vendor preset: disabled)
+   Active: active since Sun 2021-07-11 02:58:22 UTC; 21s ago
+     Docs: man:systemd.special(7)
+
+Jul 11 02:58:22 stapp01.stratos.xfusioncorp.com systemd[1]: Job graphical.target/start finished, result=done
+Jul 11 02:58:22 stapp01.stratos.xfusioncorp.com systemd[1]: Reached target Graphical Interface.
+
+systemctl set-default graphical.target
+
+
+
+systecmtl get-default
+
+systemctl get-default
+graphical.target
+
+
+
