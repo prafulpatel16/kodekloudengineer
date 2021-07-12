@@ -1,0 +1,31 @@
+
+Linux Archives
+
+On Nautilus storage server in Stratos DC there is a storage location /data which is used by different developers to keep their data (no confidential data). One of the developers mark has raised a ticket and asked for a copy of his/her data present in /data/mark directory on storage server. /home is an FTP location on storage server where developers can download their data. Below are the instructions shared by the system admin team to accomplish the task:
+
+
+a. Make a mark.tar.gz compressed archive of /data/mark directory and move the archive to /home directory on Storage Server.
+
+    ll -lsd /data/jim
+
+    [root@ststor01 ~]# ll -lsd /data/mark
+    4 drwxrwxrwx 2 root root 4096 Jul 12 03:37 /data/mark
+
+    tar -czvf jim.tar.gz /data/jim
+
+    [root@ststor01 ~]# tar -czvf mark.tar.gz /data/mark
+tar: Removing leading `/' from member names
+/data/mark/
+/data/mark/nautilus2.txt
+/data/mark/nautilus3.txt
+/data/mark/nautilus1.txt
+
+    ll
+
+    -rw------- 1 root root 3415 Aug  1  2019 anaconda-ks.cfg
+    -rw-r--r-- 1 root root  200 Jul 12 03:40 mark.tar.gz
+
+    mv jim.tar.gz /home/
+
+    ll /home/
+
