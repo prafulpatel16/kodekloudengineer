@@ -1,0 +1,60 @@
+Some users of the monitoring app have reported issues with xFusionCorp Industries mail server. They have a mail server in Stork DC where they are using postfix mail transfer agent. Postfix service seems to fail. Try to identify the root cause and fix it.
+
+
+
+Login to mail server
+
+Switch to root user
+
+Systemctl status postfix
+● postfix.service - Postfix Mail Transport Agent
+   Loaded: loaded (/usr/lib/systemd/system/postfix.service; enabled; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Tue 2021-07-13 21:07:39 UTC; 2min 23s ago
+  Process: 160 ExecStart=/usr/sbin/postfix start (code=exited, status=1/FAILURE)
+  Process: 159 ExecStartPre=/usr/libexec/postfix/chroot-update (code=exited, status=0/SUCCESS)
+  Process: 96 ExecStartPre=/usr/libexec/postfix/aliasesdb (code=exited, status=75)
+
+Jul 13 21:07:38 stmail01.stratos.xfusioncorp.com postfix[160]: fatal: parameter inet_interfaces: no ...:1
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Child 160 belongs to postfix.service
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: control process exited...=1
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service got final SIGCHLD for s...rt
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service changed start -> failed
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Job postfix.service/start finished, res...ed
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Failed to start Postfix Mail Transport ...t.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Unit postfix.service entered failed state.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service failed.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: cgroup is empty
+Hint: Some lines were ellipsized, use -l to show in full.
+Check the status of the postfix service to get detail error run -l
+Systemctl  status postfix -l 
+[root@stmail01 ~]# systemctl status postfix -l
+● postfix.service - Postfix Mail Transport Agent
+   Loaded: loaded (/usr/lib/systemd/system/postfix.service; enabled; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Tue 2021-07-13 21:07:39 UTC; 2min 45s ago
+  Process: 160 ExecStart=/usr/sbin/postfix start (code=exited, status=1/FAILURE)
+  Process: 159 ExecStartPre=/usr/libexec/postfix/chroot-update (code=exited, status=0/SUCCESS)
+  Process: 96 ExecStartPre=/usr/libexec/postfix/aliasesdb (code=exited, status=75)
+
+Jul 13 21:07:38 stmail01.stratos.xfusioncorp.com postfix[160]: fatal: parameter inet_interfaces: no local interface found for ::1
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Child 160 belongs to postfix.service
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: control process exited, code=exited status=1
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service got final SIGCHLD for state start
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service changed start -> failed
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Job postfix.service/start finished, result=failed
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Failed to start Postfix Mail Transport Agent.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: Unit postfix.service entered failed state.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service failed.
+Jul 13 21:07:39 stmail01.stratos.xfusioncorp.com systemd[1]: postfix.service: cgroup is empty
+
+Cat /etc/postfix/main.conf |grep inet_interface
+Need to edit the main.cf and comment the localhiost
+inet_interfaces = all
+#inet_interfaces = $myhostname
+#inet_interfaces = $myhostname, localhost
+#inet_interfaces = localhost
+Systemctl start postfix
+
+Systemctl status postfix
+
+telnet localhost 25
+
