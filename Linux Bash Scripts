@@ -1,0 +1,31 @@
+Linux Bash Scripts
+
+
+
+  sudo su -
+
+  cd /scrips/
+  ll
+  logout
+
+  vi media_backup.sh
+!/bin/bash
+zip -r /backup/xfusioncorp_media.zip /var/www/html/media
+scp /backup/xfusioncorp_media.zip clint@stbkp01:/backup/  
+
+
+cat media_backup.sh
+
+
+ssh 
+ssh-keygen
+ssh-copy-id clint@stbkp01
+
+ll
+chmod +x media_backup.sh
+
+ll
+
+sh media_backup.sh
+
+
