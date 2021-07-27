@@ -1,0 +1,55 @@
+Web Server Security
+
+
+During a recent security audit, the application security team of xFusionCorp Industries found security issues with the Apache web server on Nautilus App Server 1 server in Stratos DC. They have listed several security issues that need to be fixed on this server. Please apply the security settings below:
+
+
+
+a. On Nautilus App Server 1 it was identified that the Apache web server is exposing the version number. Ensure this server has the appropriate settings to hide the version number of the Apache web server.
+
+b. There is a website hosted under /var/www/html/media on App Server 1. It was detected that the directory /media lists all of its contents while browsing the URL. Disable the directory browser listing in Apache config.
+
+c. Also make sure to restart the Apache service after making the changes.
+
+
+
+systemctl status httpd
+
+ vi /etc/htpd/conf/httpd.conf
+
+add these lines
+
+ServerTokens Prod
+ServerSignature Off
+
+
+/direct
+
+Delete " indexes" from FollowSymlunks
+
+
+cat /etc/htpd/conf/httpd.conf |grep -i token
+
+
+cat /etc/htpd/conf/httpd.conf |grep -i sign
+
+
+systemctl start httpd
+[root@stapp02 ~]# curl -I http://stapp02:8080/ecommerce
+HTTP/1.1 301 Moved Permanently
+Date: Tue, 27 Jul 2021 02:54:25 GMT
+Server: Apache
+Location: http://stapp02:8080/ecommerce/
+Content-Type: text/html; charset=iso-8859-1
+
+
+[root@stapp02 ~]# curl http://stapp02:8080/ecommerce
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="http://stapp02:8080/ecommerce/">here</a>.</p>
+</body></html>
+
+
