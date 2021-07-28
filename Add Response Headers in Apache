@@ -1,0 +1,52 @@
+Add Response Headers in Apache
+
+yum install httpd -y
+
+
+ vi / etc/httpd/conf/httpd.conf 
+ 
+ 
+ cat /etc/httpd/conf/httpd.conf  |grep Listen
+ Listen 6100
+ 
+ cat /etc/httpd/conf/httpd.conf  |grep X
+
+
+Header set X-XSS-Protection "1; mode=block"
+
+Header always append X-Frame-Options SAMEORIGIN
+
+Header set X-Content-Type-Options nosniff
+
+Create Index file with given content in task
+
+ ll /var/www/html/
+ 
+  cat /var/www/html/index.html
+
+ systemctl start httpd
+
+
+
+systemctl status  httpd
+
+ curl http://localhost:5004
+Welcome to the xFusionCorp Industries!
+ 
+
+ root@stapp03 ~]# curl -i http://localhost:5004
+HTTP/1.1 200 OK
+Date: Wed, 28 Jul 2021 03:35:29 GMT
+Server: Apache/2.4.6 (CentOS)
+X-Frame-Options: SAMEORIGIN
+Last-Modified: Wed, 28 Jul 2021 03:33:08 GMT
+ETag: "27-5c826a52a979b"
+Accept-Ranges: bytes
+Content-Length: 39
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Content-Type: text/html; charset=UTF-8
+
+Welcome to the xFusionCorp Industries!
+ 
+ 
