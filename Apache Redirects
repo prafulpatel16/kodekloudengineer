@@ -1,0 +1,142 @@
+The Nautilus devops team got some requirements related to some Apache config changes. They need to setup some redirects for some URLs. There might be some more changes need to be done. Below you can find more details regarding that:
+
+
+
+httpd is already installed on app server 2. Configure Apache to listen on port 6100.
+
+Configure Apache to add some redirects as mentioned below:
+
+a.) Redirect http://stapp02.stratos.xfusioncorp.com:<Port>/ to http://www.stapp02.stratos.xfusioncorp.com:<Port>/ i.e non www to www. This must be a permanent redirect i.e 301
+
+b.) Redirect http://www.stapp02.stratos.xfusioncorp.com:<Port>/blog/ to http://www.stapp02.stratos.xfusioncorp.com:<Port>/news/. This must be a temporary redirect i.e 302.
+
+
+
+
+[root@stapp02 ~]# rpm -qa | grep httpd
+httpd-tools-2.4.6-90.el7.centos.x86_64
+httpd-2.4.6-90.el7.centos.x86_64
+
+Check existing apache port listening
+
+[root@stapp02 ~]# cat /etc/httpd/conf/httpd.conf | grep Listen
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# Change this to Listen on specific IP addresses as shown below to 
+#Listen 12.34.56.78:80
+Listen 8080
+
+-check existing redirests
+
+[root@stapp02 ~]# cat /etc/httpd/conf/httpd.conf | grep redirect
+# 1) plain text 2) local redirects 3) external redirects
+
+change listening port
+
+#Listen 12.34.56.78:80
+Listen 6100
+
+
+[root@stapp02 ~]# cat /etc/httpd/conf/httpd.conf | grep Listen
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# Change this to Listen on specific IP addresses as shown below to 
+#Listen 12.34.56.78:80
+Listen 6100
+
+
+for redirect the url create main.conf kindly change the port no and the server name as task
+
+ vi /etc/httpd/conf.d//main.conf
+
+
+
+<VirtualHost *:3002>
+  ServerName http://stapp03.stratos.xfusioncorp.com
+  Redirect 301 / http://www.stapp03.stratos.xfusioncorp.com:3002/
+</VirtualHost>
+
+
+<VirtualHost *:3002>
+  ServerName http://www.stapp03.stratos.xfusioncorp.com:3002/blog/
+  Redirect 302 / http://www.stapp02.stratos.xfusioncorp.com:3002/news/
+</VirtualHost>
+
+
+
+systemctl restart httpd
+
+systemctl status httpd
+
+
+
+curl http://stapp03.stratos.xfusioncorp.com:5000
+
+[root@stapp03 ~]# curl http://stapp03.stratos.xfusioncorp.com:3002
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="http://www.stapp03.stratos.xfusioncorp.com:3002/">here</a>.</p>
+</body></html>
+[root@stapp03 ~]# 
+
+curl http://stapp03.stratos.xfusioncorp.com:3002/
+
+
+[root@stapp03 ~]# curl http://stapp03.stratos.xfusioncorp.com:3002/
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="http://www.stapp03.stratos.xfusioncorp.com:3002/">here</a>.</p>
+</body></html>
+
+
+curl http://www.stapp03.stratos.xfusioncorp.com:3002
+
+[root@stapp02 ~]# systemctl restart httpd
+[root@stapp02 ~]# curl http://www.stapp02.stratos.xfusioncorp.com:5000
+Welcome to the Nautilus Group!
+
+curl http://www.stapp03.stratos.xfusioncorp.com:3002/blog/
+
+
+
+curl http://www.stapp02.stratos.xfusioncorp.com:6100/news/
+
+
+
+curl http://www.stapp02.stratos.xfusioncorp.com:6100/news
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<VirtualHost *:5000>
+  ServerName http://stapp02.stratos.xfusioncorp.com
+  Redirect 301 / http://www.stapp02.stratos.xfusioncorp.com:5000/
+</VirtualHost>
+
+
+<VirtualHost *:5000>
+  ServerName http://www.stapp02.stratos.xfusioncorp.com:5000/blog/
+  Redirect 302 / http://www.stapp02.stratos.xfusioncorp.com:5000/news/
+</VirtualHost>
+
+
